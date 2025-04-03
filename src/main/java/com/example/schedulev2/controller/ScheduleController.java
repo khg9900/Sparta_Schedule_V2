@@ -1,10 +1,14 @@
 package com.example.schedulev2.controller;
 
+import com.example.schedulev2.common.Const;
 import com.example.schedulev2.dto.request.schedule.CreateScheduleRequestDto;
 import com.example.schedulev2.dto.request.schedule.UpdateScheduleRequestDto;
+import com.example.schedulev2.dto.response.schedule.GetScheduleResponseDto;
 import com.example.schedulev2.dto.response.schedule.ScheduleResponseDto;
+import com.example.schedulev2.dto.response.user.LoginResponseDto;
 import com.example.schedulev2.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +24,24 @@ public class ScheduleController {
 
     // 일정 생성
     @PostMapping
-    public ResponseEntity<ScheduleResponseDto> save(@RequestBody CreateScheduleRequestDto requestDto) {
-        ScheduleResponseDto scheduleResponseDto = scheduleService.save(requestDto.getTitle(), requestDto.getContents(), requestDto.getUsername());
+    public ResponseEntity<ScheduleResponseDto> save(
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) LoginResponseDto loginUser,
+            @RequestBody CreateScheduleRequestDto requestDto
+    ) {
+        ScheduleResponseDto scheduleResponseDto = scheduleService.save(requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.CREATED);
     }
 
-    // 전체 일정 조회
+    // 전체 일정 조회 (페이징 처리)
     @GetMapping
-    public ResponseEntity<List<ScheduleResponseDto>> findAll() {
-        List<ScheduleResponseDto> scheduleResponseDtoList = scheduleService.findAll();
+    public ResponseEntity<List<GetScheduleResponseDto>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<GetScheduleResponseDto> scheduleResponseDtoList = scheduleService.findAll(page, size);
 
-        return new ResponseEntity<>(scheduleResponseDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(scheduleResponseDtoList.getContent(), HttpStatus.OK);
     }
 
     // 선택 일정 조회
@@ -60,4 +70,5 @@ public class ScheduleController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }

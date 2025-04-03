@@ -1,15 +1,17 @@
 package com.example.schedulev2.service;
 
+import com.example.schedulev2.dto.response.schedule.GetScheduleResponseDto;
 import com.example.schedulev2.dto.response.schedule.ScheduleResponseDto;
 import com.example.schedulev2.entity.Schedule;
 import com.example.schedulev2.entity.User;
 import com.example.schedulev2.repository.ScheduleRepository;
 import com.example.schedulev2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +21,9 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     // 일정 생성
-    public ScheduleResponseDto save(String title, String contents, String username) {
+    public ScheduleResponseDto save(String title, String contents, Long userId) {
 
-        User findUser = userRepository.findUserByUsernameOrElseThrow(username);
+        User findUser = userRepository.findByIdOrElseThrow(userId);
 
         Schedule schedule = new Schedule(title, contents);
         schedule.setUser(findUser);
@@ -32,8 +34,13 @@ public class ScheduleService {
     }
 
     // 전체 일정 조회
-    public List<ScheduleResponseDto> findAll() {
-        return scheduleRepository.findAll().stream().map(ScheduleResponseDto::toDto).toList();
+    public Page<GetScheduleResponseDto> findAll(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Schedule> schedulePage = scheduleRepository.findAllByOrderByUpdatedAtDesc(pageable);
+
+        return schedulePage.map(GetScheduleResponseDto::toDto);
     }
 
     // 선택 일정 조회
