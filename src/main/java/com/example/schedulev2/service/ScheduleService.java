@@ -1,7 +1,6 @@
 package com.example.schedulev2.service;
 
-import com.example.schedulev2.dto.response.schedule.GetScheduleResponseDto;
-import com.example.schedulev2.dto.response.schedule.ScheduleResponseDto;
+import com.example.schedulev2.dto.ScheduleDto;
 import com.example.schedulev2.entity.Schedule;
 import com.example.schedulev2.entity.User;
 import com.example.schedulev2.repository.ScheduleRepository;
@@ -21,7 +20,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     // 일정 생성
-    public ScheduleResponseDto save(String title, String contents, Long userId) {
+    public ScheduleDto.ScheduleResponse save(String title, String contents, Long userId) {
 
         User findUser = userRepository.findByIdOrElseThrow(userId);
 
@@ -30,24 +29,24 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
 
-        return new ScheduleResponseDto(schedule.getId(), schedule.getTitle(), schedule.getContents());
+        return new ScheduleDto.ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents());
     }
 
     // 전체 일정 조회
-    public Page<GetScheduleResponseDto> findAll(int page, int size) {
+    public Page<ScheduleDto.GetScheduleResponse> findAll(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Schedule> schedulePage = scheduleRepository.findAllByOrderByUpdatedAtDesc(pageable);
 
-        return schedulePage.map(GetScheduleResponseDto::toDto);
+        return schedulePage.map(ScheduleDto.GetScheduleResponse::toDto);
     }
 
     // 선택 일정 조회
-    public ScheduleResponseDto findById(Long id) {
+    public ScheduleDto.ScheduleResponse findById(Long id) {
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        return new ScheduleResponseDto(schedule.getId(), schedule.getTitle(), schedule.getContents());
+        return new ScheduleDto.ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents());
     }
 
     @Transactional

@@ -1,9 +1,8 @@
 package com.example.schedulev2.controller;
 
 import com.example.schedulev2.common.Const;
-import com.example.schedulev2.dto.request.comment.CommentRequestDto;
-import com.example.schedulev2.dto.response.comment.CommentResponseDto;
-import com.example.schedulev2.dto.response.user.LoginResponseDto;
+import com.example.schedulev2.dto.CommentDto;
+import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,20 +20,20 @@ public class CommentController {
 
     // 댓글 생성
     @PostMapping
-    public ResponseEntity<CommentResponseDto> save(
+    public ResponseEntity<CommentDto.CommentResponse> save(
             @PathVariable(value = "schedule_id") Long scheduleId,
-            @SessionAttribute(name = Const.LOGIN_USER, required = false) LoginResponseDto loginUser,
-            @RequestBody CommentRequestDto requestDto
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
+            @RequestBody CommentDto.CommentRequest requestDto
     ) {
-        CommentResponseDto commentResponseDto = commentService.save(scheduleId, requestDto.getContents(), loginUser.getId());
+        CommentDto.CommentResponse commentResponseDto = commentService.save(scheduleId, requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(commentResponseDto, HttpStatus.CREATED);
     }
 
     // 일정별 전체 댓글 조회
     @GetMapping
-    public ResponseEntity<List<CommentResponseDto>> findAll(@PathVariable(value = "schedule_id") Long scheduleId) {
-        List<CommentResponseDto> commentResponseDtoList = commentService.findAll(scheduleId);
+    public ResponseEntity<List<CommentDto.CommentResponse>> findAll(@PathVariable(value = "schedule_id") Long scheduleId) {
+        List<CommentDto.CommentResponse> commentResponseDtoList = commentService.findAll(scheduleId);
 
         return new ResponseEntity<>(commentResponseDtoList, HttpStatus.OK);
     }
@@ -43,7 +42,7 @@ public class CommentController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateComment(
             @PathVariable Long id,
-            @RequestBody CommentRequestDto requestDto
+            @RequestBody CommentDto.CommentRequest requestDto
     ) {
         commentService.updateComment(id, requestDto.getContents());
 

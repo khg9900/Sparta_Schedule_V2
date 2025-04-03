@@ -1,6 +1,6 @@
 package com.example.schedulev2.service;
 
-import com.example.schedulev2.dto.response.comment.CommentResponseDto;
+import com.example.schedulev2.dto.CommentDto;
 import com.example.schedulev2.entity.Comment;
 import com.example.schedulev2.entity.Schedule;
 import com.example.schedulev2.entity.User;
@@ -21,7 +21,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     // 댓글 생성
-    public CommentResponseDto save(Long scheduleId, String contents, Long userId) {
+    public CommentDto.CommentResponse save(Long scheduleId, String contents, Long userId) {
 
         User findUser = userRepository.findByIdOrElseThrow(userId);
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(scheduleId);
@@ -32,12 +32,12 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return new CommentResponseDto(comment.getId(), comment.getContents(), comment.getUser().getUsername());
+        return new CommentDto.CommentResponse(comment.getId(), comment.getContents(), comment.getUser().getUsername());
     }
 
     // 일정별 전체 댓글 조회
-    public List<CommentResponseDto> findAll(Long scheduleId) {
-        return commentRepository.findBySchedule_Id(scheduleId).stream().map(CommentResponseDto::toDto).toList();
+    public List<CommentDto.CommentResponse> findAll(Long scheduleId) {
+        return commentRepository.findBySchedule_Id(scheduleId).stream().map(CommentDto.CommentResponse::toDto).toList();
     }
 
     public void updateComment(Long id, String contents) {

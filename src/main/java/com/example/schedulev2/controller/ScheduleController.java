@@ -1,11 +1,8 @@
 package com.example.schedulev2.controller;
 
 import com.example.schedulev2.common.Const;
-import com.example.schedulev2.dto.request.schedule.CreateScheduleRequestDto;
-import com.example.schedulev2.dto.request.schedule.UpdateScheduleRequestDto;
-import com.example.schedulev2.dto.response.schedule.GetScheduleResponseDto;
-import com.example.schedulev2.dto.response.schedule.ScheduleResponseDto;
-import com.example.schedulev2.dto.response.user.LoginResponseDto;
+import com.example.schedulev2.dto.ScheduleDto;
+import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,30 +21,30 @@ public class ScheduleController {
 
     // 일정 생성
     @PostMapping
-    public ResponseEntity<ScheduleResponseDto> save(
-            @SessionAttribute(name = Const.LOGIN_USER, required = false) LoginResponseDto loginUser,
-            @RequestBody CreateScheduleRequestDto requestDto
+    public ResponseEntity<ScheduleDto.ScheduleResponse> save(
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
+            @RequestBody ScheduleDto.CreateScheduleRequest requestDto
     ) {
-        ScheduleResponseDto scheduleResponseDto = scheduleService.save(requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
+        ScheduleDto.ScheduleResponse scheduleResponseDto = scheduleService.save(requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.CREATED);
     }
 
     // 전체 일정 조회 (페이징 처리)
     @GetMapping
-    public ResponseEntity<List<GetScheduleResponseDto>> findAll(
+    public ResponseEntity<List<ScheduleDto.GetScheduleResponse>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<GetScheduleResponseDto> scheduleResponseDtoList = scheduleService.findAll(page, size);
+        Page<ScheduleDto.GetScheduleResponse> scheduleResponseDtoList = scheduleService.findAll(page, size);
 
         return new ResponseEntity<>(scheduleResponseDtoList.getContent(), HttpStatus.OK);
     }
 
     // 선택 일정 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleResponseDto> findById(@PathVariable Long id) {
-        ScheduleResponseDto scheduleResponseDto = scheduleService.findById(id);
+    public ResponseEntity<ScheduleDto.ScheduleResponse> findById(@PathVariable Long id) {
+        ScheduleDto.ScheduleResponse scheduleResponseDto = scheduleService.findById(id);
 
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.OK);
     }
@@ -56,7 +53,7 @@ public class ScheduleController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateSchedule(
             @PathVariable Long id,
-            @RequestBody UpdateScheduleRequestDto requestDto
+            @RequestBody ScheduleDto.UpdateScheduleRequest requestDto
     ) {
         scheduleService.updateSchedule(id, requestDto.getTitle(), requestDto.getContents());
 

@@ -1,13 +1,10 @@
 package com.example.schedulev2.repository;
 
-import com.example.schedulev2.dto.response.comment.CommentResponseDto;
 import com.example.schedulev2.entity.Comment;
-import com.example.schedulev2.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {

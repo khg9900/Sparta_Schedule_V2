@@ -1,12 +1,7 @@
 package com.example.schedulev2.controller;
 
 import com.example.schedulev2.common.Const;
-import com.example.schedulev2.dto.request.user.LoginRequestDto;
-import com.example.schedulev2.dto.request.user.SignUpRequestDto;
-import com.example.schedulev2.dto.request.user.UpdatePasswordRequestDto;
-import com.example.schedulev2.dto.response.user.LoginResponseDto;
-import com.example.schedulev2.dto.response.user.SignUpResponseDto;
-import com.example.schedulev2.dto.response.user.UserResponseDto;
+import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -24,8 +19,8 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDto> signUp(@RequestBody SignUpRequestDto requestDto) {
-        SignUpResponseDto signUpResponseDto =
+    public ResponseEntity<UserDto.SignUpResponse> signUp(@RequestBody UserDto.SignUpRequest requestDto) {
+        UserDto.SignUpResponse signUpResponseDto =
                 userService.signUp(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
 
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.CREATED);
@@ -33,12 +28,12 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(
-            @RequestBody LoginRequestDto requestDto,
+    public ResponseEntity<UserDto.LoginResponse> login(
+            @RequestBody UserDto.LoginRequest requestDto,
             HttpServletRequest request
     ) {
 
-        LoginResponseDto loginResponseDto = userService.login(requestDto.getEmail(), requestDto.getPassword());
+        UserDto.LoginResponse loginResponseDto = userService.login(requestDto.getEmail(), requestDto.getPassword());
 
         HttpSession session = request.getSession();
         session.setAttribute(Const.LOGIN_USER, loginResponseDto);
@@ -60,9 +55,9 @@ public class UserController {
 
     // 회원조회
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {
+    public ResponseEntity<UserDto.UserResponse> findById(@PathVariable Long id) {
 
-        UserResponseDto userResponseDto = userService.findById(id);
+        UserDto.UserResponse userResponseDto = userService.findById(id);
 
         return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
@@ -71,7 +66,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updatePassword(
             @PathVariable Long id,
-            @RequestBody UpdatePasswordRequestDto requestDto
+            @RequestBody UserDto.UpdatePasswordRequest requestDto
     ) {
         userService.updatePassword(id, requestDto.getOldPassword(), requestDto.getNewPassword());
 

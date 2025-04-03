@@ -1,9 +1,7 @@
 package com.example.schedulev2.service;
 
 import com.example.schedulev2.config.PasswordEncoder;
-import com.example.schedulev2.dto.response.user.LoginResponseDto;
-import com.example.schedulev2.dto.response.user.SignUpResponseDto;
-import com.example.schedulev2.dto.response.user.UserResponseDto;
+import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.entity.User;
 import com.example.schedulev2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +18,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입
-    public SignUpResponseDto signUp(String username, String email, String password) {
+    public UserDto.SignUpResponse signUp(String username, String email, String password) {
 
         String encodedPassword = passwordEncoder.encode(password);
 
         User user = new User(username, email, encodedPassword);
         User savedUser = userRepository.save(user);
 
-        return new SignUpResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
+        return new UserDto.SignUpResponse(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
     }
 
     // 로그인
-    public LoginResponseDto login(String email, String password) {
+    public UserDto.LoginResponse login(String email, String password) {
 
         User findUser = userRepository.findUserByEmailOrElseThrow(email);
 
@@ -39,15 +37,15 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
 
-        return new LoginResponseDto(findUser.getId(), findUser.getUsername());
+        return new UserDto.LoginResponse(findUser.getId(), findUser.getUsername());
     }
 
     // 회원조회
-    public UserResponseDto findById(Long id) {
+    public UserDto.UserResponse findById(Long id) {
 
         User findUser = userRepository.findByIdOrElseThrow(id);
 
-        return new UserResponseDto(findUser.getUsername(), findUser.getEmail());
+        return new UserDto.UserResponse(findUser.getUsername(), findUser.getEmail());
     }
 
     // 비밀번호 수정
