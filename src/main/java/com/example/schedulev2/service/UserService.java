@@ -1,5 +1,6 @@
 package com.example.schedulev2.service;
 
+import com.example.schedulev2.config.PasswordEncoder;
 import com.example.schedulev2.dto.response.user.LoginResponseDto;
 import com.example.schedulev2.dto.response.user.SignUpResponseDto;
 import com.example.schedulev2.dto.response.user.UserResponseDto;
@@ -16,10 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 회원가입
     public SignUpResponseDto signUp(String username, String email, String password) {
-        User user = new User(username, email, password);
+
+        String encodedPassword = passwordEncoder.encode(password);
+
+        User user = new User(username, email, encodedPassword);
         User savedUser = userRepository.save(user);
 
         return new SignUpResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
@@ -30,7 +35,7 @@ public class UserService {
 
         User findUser = userRepository.findUserByEmailOrElseThrow(email);
 
-        if (!findUser.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
 
@@ -51,11 +56,13 @@ public class UserService {
 
         User findUser = userRepository.findByIdOrElseThrow(id);
 
-        if (!findUser.getPassword().equals(oldPassword)) {
+        if (!passwordEncoder.matches(oldPassword, findUser.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
 
-        findUser.updatePassword(newPassword);
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        findUser.updatePassword(encodedPassword);
     }
 
     // 회원탈퇴
