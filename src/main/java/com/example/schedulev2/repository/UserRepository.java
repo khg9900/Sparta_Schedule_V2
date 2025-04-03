@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserByUsername(String username);
+    Optional<User> findUserByEmail(String email);
 
     default User findByIdOrElseThrow(Long id) {
         return findById(id)
@@ -19,5 +20,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     default User findUserByUsernameOrElseThrow(String username) {
         return findUserByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT, "일치하는 회원명 : " + username + " 이(가) 없습니다."));
+    }
+
+    default User findUserByEmailOrElseThrow(String email) {
+        return findUserByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT, "일치하는 회원 이메일 : " + email + " 이 없습니다."));
     }
 }

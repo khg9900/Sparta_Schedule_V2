@@ -1,5 +1,6 @@
 package com.example.schedulev2.service;
 
+import com.example.schedulev2.dto.response.user.LoginResponseDto;
 import com.example.schedulev2.dto.response.user.SignUpResponseDto;
 import com.example.schedulev2.dto.response.user.UserResponseDto;
 import com.example.schedulev2.entity.User;
@@ -22,6 +23,18 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return new SignUpResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
+    }
+
+    // 로그인
+    public LoginResponseDto login(String email, String password) {
+
+        User findUser = userRepository.findUserByEmailOrElseThrow(email);
+
+        if (!findUser.getPassword().equals(password)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+
+        return new LoginResponseDto(findUser.getId(), findUser.getUsername());
     }
 
     // 회원조회
