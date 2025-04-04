@@ -47,7 +47,7 @@ public class ScheduleService {
     public ScheduleDto.GetScheduleResponse findById(Long id) {
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        return new ScheduleDto.GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getCreatedAt(), schedule.getUpdatedAt(), schedule.getUser().getUsername());
+        return new ScheduleDto.GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getComments().size(), schedule.getCreatedAt(), schedule.getUpdatedAt(), schedule.getUser().getUsername());
     }
 
     // 일정 수정

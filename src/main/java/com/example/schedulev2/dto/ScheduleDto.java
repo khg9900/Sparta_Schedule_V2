@@ -53,21 +53,23 @@ public class ScheduleDto {
         private final Long id;
         private final String title;
         private final String contents;
+        private final int commentsNum;
         private final LocalDateTime createdAt;
         private final LocalDateTime updatedAt;
         private final String username;
 
-        public GetScheduleResponse(Long id, String title, String contents, LocalDateTime createdAt, LocalDateTime updatedAt, String username) {
+        public GetScheduleResponse(Long id, String title, String contents, int commentsNum, LocalDateTime createdAt, LocalDateTime updatedAt, String username) {
             this.id = id;
             this.title = title;
             this.contents = contents;
+            this.commentsNum = commentsNum;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
             this.username = username;
         }
 
         public static GetScheduleResponse toDto(Schedule schedule) {
-            return new ScheduleDto.GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getCreatedAt(), schedule.getUpdatedAt(), schedule.getUser().getUsername());
+            return new ScheduleDto.GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getComments().size(), schedule.getCreatedAt(), schedule.getUpdatedAt(), schedule.getUser().getUsername());
         }
     }
 }
