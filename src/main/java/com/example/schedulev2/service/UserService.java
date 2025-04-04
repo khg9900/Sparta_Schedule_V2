@@ -3,12 +3,11 @@ package com.example.schedulev2.service;
 import com.example.schedulev2.config.PasswordEncoder;
 import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.entity.User;
+import com.example.schedulev2.exception.PasswordMismatchException;
 import com.example.schedulev2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +32,7 @@ public class UserService {
 
         User findUser = userRepository.findUserByEmailOrElseThrow(email);
 
-        if (!passwordEncoder.matches(password, findUser.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
+        isCorrectPassword(password, findUser);
 
         return new UserDto.LoginResponse(findUser.getId(), findUser.getUsername());
     }
@@ -54,9 +51,7 @@ public class UserService {
 
         User findUser = userRepository.findByIdOrElseThrow(id);
 
-        if (!passwordEncoder.matches(oldPassword, findUser.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
+        isCorrectPassword(oldPassword, findUser);
 
         String encodedPassword = passwordEncoder.encode(newPassword);
 
@@ -64,10 +59,17 @@ public class UserService {
     }
 
     // 회원탈퇴
-    public void delete(Long id) {
+    public void delete(Long id, String password) {
         User findUser = userRepository.findByIdOrElseThrow(id);
+
+        isCorrectPassword(password, findUser);
 
         userRepository.delete(findUser);
     }
 
+    public void isCorrectPassword(String password, User user) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new PasswordMismatchException();
+        }
+    }
 }

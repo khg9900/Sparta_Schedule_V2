@@ -5,6 +5,7 @@ import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<UserDto.SignUpResponse> signUp(@RequestBody UserDto.SignUpRequest requestDto) {
+    public ResponseEntity<UserDto.SignUpResponse> signUp(@Valid @RequestBody UserDto.SignUpRequest requestDto) {
         UserDto.SignUpResponse signUpResponseDto =
                 userService.signUp(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
 
@@ -29,7 +30,7 @@ public class UserController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<UserDto.LoginResponse> login(
-            @RequestBody UserDto.LoginRequest requestDto,
+            @Valid @RequestBody UserDto.LoginRequest requestDto,
             HttpServletRequest request
     ) {
 
@@ -66,7 +67,7 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updatePassword(
             @PathVariable Long id,
-            @RequestBody UserDto.UpdatePasswordRequest requestDto
+            @Valid @RequestBody UserDto.UpdatePasswordRequest requestDto
     ) {
         userService.updatePassword(id, requestDto.getOldPassword(), requestDto.getNewPassword());
 
@@ -75,8 +76,11 @@ public class UserController {
 
     // 회원탈퇴
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.delete(id);
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            @RequestParam String password
+    ) {
+        userService.delete(id, password);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

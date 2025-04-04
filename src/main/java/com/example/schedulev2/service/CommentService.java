@@ -4,11 +4,13 @@ import com.example.schedulev2.dto.CommentDto;
 import com.example.schedulev2.entity.Comment;
 import com.example.schedulev2.entity.Schedule;
 import com.example.schedulev2.entity.User;
+import com.example.schedulev2.exception.UnauthorizedException;
 import com.example.schedulev2.repository.CommentRepository;
 import com.example.schedulev2.repository.ScheduleRepository;
 import com.example.schedulev2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,19 +39,28 @@ public class CommentService {
 
     // 일정별 전체 댓글 조회
     public List<CommentDto.CommentResponse> findAll(Long scheduleId) {
-        return commentRepository.findBySchedule_Id(scheduleId).stream().map(CommentDto.CommentResponse::toDto).toList();
+        return commentRepository.findBySchedule_IdOrderByUpdatedAtDesc(scheduleId).stream().map(CommentDto.CommentResponse::toDto).toList();
     }
 
-    public void updateComment(Long id, String contents) {
+    // 댓글 수정
+    @Transactional
+    public void updateComment(Long id, String contents, Long userId) {
         Comment findComment = commentRepository.findByIdOrElseThrow(id);
-
+        validateAuthor(userId, findComment);
         findComment.updateComment(contents);
     }
 
     // 댓글 삭제
-    public void deleteComment(Long id) {
+    public void deleteComment(Long id, Long userId) {
         Comment findComment = commentRepository.findByIdOrElseThrow(id);
-
+        validateAuthor(userId, findComment);
         commentRepository.delete(findComment);
+    }
+
+    // 작성자 일치 여부 확인
+    public void validateAuthor(Long userId, Comment comment) {
+        if (!userId.equals(comment.getUser().getId())) {
+            throw new UnauthorizedException();
+        }
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findBySchedule_Id(Long scheduleId);
+    List<Comment> findBySchedule_IdOrderByUpdatedAtDesc(Long scheduleId);
 
     default Comment findByIdOrElseThrow(Long id) {
         return findById(id)

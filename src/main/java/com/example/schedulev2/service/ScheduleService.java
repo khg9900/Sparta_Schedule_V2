@@ -3,6 +3,7 @@ package com.example.schedulev2.service;
 import com.example.schedulev2.dto.ScheduleDto;
 import com.example.schedulev2.entity.Schedule;
 import com.example.schedulev2.entity.User;
+import com.example.schedulev2.exception.UnauthorizedException;
 import com.example.schedulev2.repository.ScheduleRepository;
 import com.example.schedulev2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class ScheduleService {
     // 전체 일정 조회
     public Page<ScheduleDto.GetScheduleResponse> findAll(int page, int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page-1, size);
 
         Page<Schedule> schedulePage = scheduleRepository.findAllByOrderByUpdatedAtDesc(pageable);
 
@@ -43,25 +44,32 @@ public class ScheduleService {
     }
 
     // 선택 일정 조회
-    public ScheduleDto.ScheduleResponse findById(Long id) {
+    public ScheduleDto.GetScheduleResponse findById(Long id) {
         Schedule schedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        return new ScheduleDto.ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents());
+        return new ScheduleDto.GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getCreatedAt(), schedule.getUpdatedAt(), schedule.getUser().getUsername());
     }
 
-    @Transactional
     // 일정 수정
-    public void updateSchedule(Long id, String title, String contents) {
+    @Transactional
+    public void updateSchedule(Long id, String title, String contents, Long userId) {
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
-
+        validateAuthor(userId, findSchedule);
         findSchedule.updateSchedule(title, contents);
     }
 
     // 일정 삭제
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Long id, Long userId) {
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
-
+        validateAuthor(userId, findSchedule);
         scheduleRepository.delete(findSchedule);
+    }
+
+    // 작성자 일치 여부 확인
+    public void validateAuthor(Long userId, Schedule scheudle) {
+        if (!userId.equals(scheudle.getUser().getId())) {
+            throw new UnauthorizedException();
+        }
     }
 
 }

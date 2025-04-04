@@ -1,6 +1,7 @@
 package com.example.schedulev2.dto;
 
 import com.example.schedulev2.entity.Comment;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 public class CommentDto {
@@ -9,6 +10,7 @@ public class CommentDto {
     @Getter
     public static class CommentRequest {
 
+        @NotBlank(message = "댓글 내용을 입력해 주세요.")
         private final String contents;
 
         public CommentRequest(String contents) {

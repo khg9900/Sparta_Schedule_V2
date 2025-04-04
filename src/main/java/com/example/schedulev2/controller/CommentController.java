@@ -4,6 +4,7 @@ import com.example.schedulev2.common.Const;
 import com.example.schedulev2.dto.CommentDto;
 import com.example.schedulev2.dto.UserDto;
 import com.example.schedulev2.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class CommentController {
     public ResponseEntity<CommentDto.CommentResponse> save(
             @PathVariable(value = "schedule_id") Long scheduleId,
             @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
-            @RequestBody CommentDto.CommentRequest requestDto
+            @Valid @RequestBody CommentDto.CommentRequest requestDto
     ) {
         CommentDto.CommentResponse commentResponseDto = commentService.save(scheduleId, requestDto.getContents(), loginUser.getId());
 
@@ -41,18 +42,22 @@ public class CommentController {
     // 댓글 수정
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateComment(
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
             @PathVariable Long id,
             @RequestBody CommentDto.CommentRequest requestDto
     ) {
-        commentService.updateComment(id, requestDto.getContents());
+        commentService.updateComment(id, requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 댓글 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
+    public ResponseEntity<Void> deleteComment(
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
+            @PathVariable Long id
+    ) {
+        commentService.deleteComment(id, loginUser.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

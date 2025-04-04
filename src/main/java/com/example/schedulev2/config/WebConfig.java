@@ -12,9 +12,9 @@ public class WebConfig {
     @Bean
     public FilterRegistrationBean loginFilter() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new LoginFilter()); // Filter 등록
-        filterRegistrationBean.setOrder(1); // Filter 순서 2 설정
-        filterRegistrationBean.addUrlPatterns("/*"); // 전체 URL에 Filter 적용
+        filterRegistrationBean.setFilter(new LoginFilter());
+        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.addUrlPatterns("/*");
 
         return filterRegistrationBean;
     }
