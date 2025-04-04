@@ -2,43 +2,41 @@ package com.example.schedulev2.config;
 
 import com.example.schedulev2.exception.ApplicationException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private final HttpServletRequest request;
-
-    public GlobalExceptionHandler(HttpServletRequest request) {
-        this.request = request;
-    }
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<Map<String, Object>> handleApplicationException(ApplicationException ex) {
         return getErrorResponse(ex.getStatus(), ex.getMessage());
     }
 
-    // 회원가입시 이메일 중복 // 수정수정수정
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
-        return new ResponseEntity<>("이미 존재하는 회원입니다.", HttpStatus.CONFLICT);
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    // Valid를 지키지 않은 입력을 받았을 때
+    // Valid 에러
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
 
+        // field 에러
         List<Map<String, String>> fieldErrors = new ArrayList<>();
-
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             Map<String, String> errors = new LinkedHashMap<>();
             errors.put("field", error.getField());
@@ -47,6 +45,7 @@ public class GlobalExceptionHandler {
             fieldErrors.add(errors);
         }
 
+        // 에러 메시지
         Map<String, Object> errorResponse = new LinkedHashMap<>();
 
         errorResponse.put("timestamp", LocalDateTime.now());

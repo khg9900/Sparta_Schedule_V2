@@ -26,7 +26,8 @@ public class CommentController {
             @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
             @Valid @RequestBody CommentDto.CommentRequest requestDto
     ) {
-        CommentDto.CommentResponse commentResponseDto = commentService.save(scheduleId, requestDto.getContents(), loginUser.getId());
+        CommentDto.CommentResponse commentResponseDto =
+                commentService.save(scheduleId, requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(commentResponseDto, HttpStatus.CREATED);
     }

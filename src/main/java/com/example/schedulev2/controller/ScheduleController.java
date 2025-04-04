@@ -26,7 +26,8 @@ public class ScheduleController {
             @SessionAttribute(name = Const.LOGIN_USER, required = false) UserDto.LoginResponse loginUser,
             @Valid @RequestBody ScheduleDto.ScheduleRequest requestDto
     ) {
-        ScheduleDto.ScheduleResponse scheduleResponseDto = scheduleService.save(requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
+        ScheduleDto.ScheduleResponse scheduleResponseDto =
+                scheduleService.save(requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.CREATED);
     }
@@ -57,7 +58,6 @@ public class ScheduleController {
             @PathVariable Long id,
             @Valid @RequestBody ScheduleDto.ScheduleRequest requestDto
     ) {
-
         scheduleService.updateSchedule(id, requestDto.getTitle(), requestDto.getContents(), loginUser.getId());
 
         return new ResponseEntity<>(HttpStatus.OK);

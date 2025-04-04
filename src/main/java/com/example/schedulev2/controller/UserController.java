@@ -21,6 +21,7 @@ public class UserController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<UserDto.SignUpResponse> signUp(@Valid @RequestBody UserDto.SignUpRequest requestDto) {
+
         UserDto.SignUpResponse signUpResponseDto =
                 userService.signUp(requestDto.getUsername(), requestDto.getEmail(), requestDto.getPassword());
 
@@ -33,9 +34,9 @@ public class UserController {
             @Valid @RequestBody UserDto.LoginRequest requestDto,
             HttpServletRequest request
     ) {
-
         UserDto.LoginResponse loginResponseDto = userService.login(requestDto.getEmail(), requestDto.getPassword());
 
+        // 세션에 로그인 정보 저장
         HttpSession session = request.getSession();
         session.setAttribute(Const.LOGIN_USER, loginResponseDto);
 
@@ -45,8 +46,9 @@ public class UserController {
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
 
+        HttpSession session = request.getSession(false);
+        // 세션 삭제
         if (session != null) {
             session.invalidate();
         }
